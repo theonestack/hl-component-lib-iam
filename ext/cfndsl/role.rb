@@ -49,7 +49,7 @@ def iam_policy(name,actions,resources='*',condition={},effect='Allow')
   statement = {
       Sid: name.gsub('_', '').gsub('-', '').downcase,
       Action: actions,
-      Resource: resources.map {|res| FnSub(res)},
+      Resource: resources,
       Effect: effect
   }
 
