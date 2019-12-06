@@ -15,20 +15,6 @@ def service_assume_role_policy(services)
   }
 end
 
-"""
-Returns an array of defined policies
-YAML Structure
-iam_policies:
-  policy_name:
-    action:
-      - ec2:describeInstances
-    resource:
-      - arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:instance/${InstanceId}
-    effect: Allow
-    condition:
-      StringLike:
-        ec2:ResourceTag/EnvironmentName: dev
-"""
 def iam_role_policies(iam_policy_config={})
   policies = []
   iam_policy_config.each do |name,policy|

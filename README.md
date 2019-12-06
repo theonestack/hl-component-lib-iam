@@ -1,22 +1,38 @@
 # iam-role CfHighlander component
 
-## Cfhighlander Setup
+## Methods
 
-install cfhighlander [gem](https://github.com/theonestack/cfhighlander)
+**service_assume_role_policy(services)**
 
-```bash
-gem install cfhighlander
+`services` - Array or String of aws services
+
+```ruby
+IAM_ROLE(:Role) {
+  AssumeRolePolicyDocument service_assume_role_policy('ec2')
+  ...
+} 
 ```
 
-or via docker
+**iam_role_policies(iam_policy_yaml)**
 
-```bash
-docker pull theonestack/cfhighlander
-```
-## Testing Components
+`iam_policy_yaml` - yaml hash config of iam policies
 
-Running the tests
+```yaml
+iam_policies:
+  policy_name:
+    action:
+      - ec2:describeInstances
+    resource:
+      - arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:instance/${InstanceId}
+    effect: Allow
+    condition:
+      StringLike:
+        ec2:ResourceTag/EnvironmentName: dev
+``` 
 
-```bash
-cfhighlander cftest iam-role
+```ruby
+IAM_ROLE(:Role) {
+  Policies iam_role_policies(iam_policies)
+  ...
+} 
 ```
