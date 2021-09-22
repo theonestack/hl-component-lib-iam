@@ -94,5 +94,69 @@ context "iam_role_policies" do
       :PolicyName=>"ec2-volumes"
     }])
   end
+
+  it 'creates multiple statements for a policy' do
+    multi_statement_policy = {
+      'ec2-volumes'=>[
+        {
+          'action'=>[
+            'ec2:AttachVolume',
+            'ec2:DetachVolume'
+          ],
+          'resource'=>[
+            'arn:aws:ec2:*:*:volume/*',
+            'arn:aws:ec2:*:*:instance/*'
+          ],
+          'condition'=>[
+            'ArnEquals'=>{
+              'ec2:SourceInstanceARN'=>'arn:aws:ec2:*:*:instance/i-123456abcdefg'
+            }
+          ]
+        },
+        {
+          'action'=>[
+            'ec2:StopInstance',
+          ],
+          'resource'=>'arn:aws:ec2:*:*:instance/i-123456789'
+        }
+      ]
+    }
+    expect(iam_role_policies(multi_statement_policy)).to eq([{
+      :PolicyDocument=>{
+        :Statement=>[
+          {
+            :Action=>[
+              "ec2:AttachVolume", 
+              "ec2:DetachVolume"
+            ],
+            :Resource=>[
+              "arn:aws:ec2:*:*:volume/*", 
+              "arn:aws:ec2:*:*:instance/*"
+            ],
+            :Condition=>[
+              {
+                "ArnEquals"=>{
+                  "ec2:SourceInstanceARN"=>"arn:aws:ec2:*:*:instance/i-123456abcdefg"
+                }
+              }
+            ],
+            :Effect=>"Allow",
+            :Sid=>"ec2volumes0"
+          },
+          {
+            :Action=>[
+              "ec2:StopInstance"
+            ],
+            :Resource=>[
+              "arn:aws:ec2:*:*:instance/i-123456789"
+            ],
+            :Effect=>"Allow",
+            :Sid=>"ec2volumes1"
+          }
+        ]
+      }, 
+      :PolicyName=>"ec2-volumes"
+    }])
+  end
   
 end

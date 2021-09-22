@@ -18,18 +18,40 @@ end
 def iam_role_policies(iam_policy_config={})
   policies = []
   iam_policy_config.each do |name,policy|
-    policies << iam_policy(
-      name,
-      policy['action'],
-      policy['resource'] || '*',
-      policy['condition'] || {},
-      policy['effect'] || 'Allow')
+    if policy.kind_of?(Array)
+      statements = policy.map.with_index {|pol, index| get_statement("#{name}#{index}", pol)}
+      policies << get_policy(name, statements)
+    elsif policy.kind_of?(Hash)
+      statement = get_statement(name, policy)
+      policies << get_policy(name, statement)
+    else
+      raise ArgumentError.new("iam role policies expecting policy to be of type Array or Hash, recieved type #{policy.class}")      
+    end
   end
   return policies
 end
 
-def iam_policy(name,actions,resources='*',condition={},effect='Allow')
-  
+def get_policy(name, statement)
+  statements = (statement.kind_of?(Array) ? statement : [statement])
+   
+  return {
+    PolicyName: name,
+    PolicyDocument: {
+      Statement: statements
+    }
+  }
+end
+
+def get_statement(name, policy)
+  if !policy.has_key?('action')
+    raise ArgumentError.new("iam role policy must have an action defined")
+  end
+
+  actions = policy['action']
+  effect = policy.fetch('effect', 'Allow')
+  resources = policy.fetch('resource', '*')
+  condition = policy.fetch('condition', {})
+
   resources = (resources.kind_of?(Array) ? resources : [resources])
   
   statement = {
@@ -42,13 +64,6 @@ def iam_policy(name,actions,resources='*',condition={},effect='Allow')
   if !condition.empty?
     statement[:Condition] = condition
   end
-  
-  policy = {
-    PolicyName: name,
-    PolicyDocument: {
-      Statement: [statement]
-    }
-  }
-  
-  return policy
+
+  return statement
 end
