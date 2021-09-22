@@ -17,18 +17,40 @@ IAM_ROLE(:Role) {
 
 `iam_policy_yaml` - yaml hash config of iam policies
 
+single statement policies
+
 ```yaml
 iam_policies:
   policy_name:
     action:
-      - ec2:describeInstances
+      - ec2:DescribeInstances
     resource:
-      - arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:instance/${InstanceId}
+      - Fn::Sub: arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:instance/${InstanceId}
     effect: Allow
     condition:
       StringLike:
         ec2:ResourceTag/EnvironmentName: dev
 ``` 
+
+multi statement policies
+
+```yaml
+iam_policies:
+  policy_name:
+  -
+    action:
+      - ec2:DescribeInstances
+    resource:
+      - Fn::Sub: arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:instance/${InstanceId}
+    effect: Allow
+    condition:
+      StringLike:
+        ec2:ResourceTag/EnvironmentName: dev
+  -
+    action:
+      - ec2:DescribeRegions
+``` 
+
 
 ```ruby
 IAM_ROLE(:Role) {
