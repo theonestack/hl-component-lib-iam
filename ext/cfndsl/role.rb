@@ -37,6 +37,7 @@ def get_policy(name, statement)
   return {
     PolicyName: name,
     PolicyDocument: {
+      Version: '2012-10-17',
       Statement: statements
     }
   }
