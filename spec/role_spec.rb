@@ -45,7 +45,8 @@ context "iam_role_policies" do
           :Effect=>"Allow", 
           :Resource=>["*"], 
           :Sid=>"mypolicy"
-        }]
+        }], 
+        :Version=>"2012-10-17"
       }, 
       :PolicyName=>"my-policy"
     }])
@@ -89,7 +90,8 @@ context "iam_role_policies" do
           ],
           :Effect=>"Allow",
           :Sid=>"ec2volumes"
-        }]
+        }], 
+        :Version=>"2012-10-17"
       }, 
       :PolicyName=>"ec2-volumes"
     }])
@@ -153,7 +155,8 @@ context "iam_role_policies" do
             :Effect=>"Allow",
             :Sid=>"ec2volumes1"
           }
-        ]
+        ], 
+        :Version=>"2012-10-17"
       }, 
       :PolicyName=>"ec2-volumes"
     }])
